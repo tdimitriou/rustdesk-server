@@ -1,0 +1,63 @@
+name: Manual Server Binaries Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_release:
+        description: "Also publish artifacts to a GitHub release tag"
+        required: true
+        default: false
+        type: boolean
+      release_tag:
+        description: "Release tag name when upload_release=true"
+        required: true
+        default: "server-nightly"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux-amd64:
+    name: Build Linux amd64 binaries
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build release binaries
+        run: cargo build --release
+
+      - name: Prepare artifact bundle
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/release/hbbs target/release/hbbr target/release/rustdesk-utils dist/
+          chmod +x dist/hbbs dist/hbbr dist/rustdesk-utils
+          tar -C dist -czf rustdesk-server-linux-amd64.tar.gz hbbs hbbr rustdesk-utils
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustdesk-server-linux-amd64
+          path: rustdesk-server-linux-amd64.tar.gz
+          if-no-files-found: error
+
+      - name: Publish release asset
+        if: ${{ inputs.upload_release }}
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          tag_name: ${{ inputs.release_tag }}
+          overwrite_files: true
+          files: rustdesk-server-linux-amd64.tar.gz
