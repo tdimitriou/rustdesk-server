@@ -18,7 +18,6 @@ permissions:
   contents: write
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   TARGET_TRIPLE: x86_64-unknown-linux-musl
 
 jobs:
@@ -27,7 +26,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -56,7 +55,7 @@ jobs:
           tar -C dist -czf rustdesk-server-linux-amd64.tar.gz hbbs hbbr rustdesk-utils
 
       - name: Upload workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: rustdesk-server-linux-amd64
           path: rustdesk-server-linux-amd64.tar.gz
