@@ -18,6 +18,10 @@ git push origin master
 
 If upstream uses `main`, replace branch names accordingly.
 
+## Fork note: Change ID (`RegisterPk` over TCP)
+
+Upstream OSS hbbs answered `NOT_SUPPORT` for `RegisterPk` on **TCP/WebSocket** while handling it on **UDP**. The Flutter/Rust client uses TCP for Change ID checks, so this fork routes **TCP `RegisterPk`** through the same logic as UDP (`handle_register_pk_message`). Deploy updated `hbbs` before expecting Change ID to succeed from clients.
+
 ## Production-safe upgrade checklist
 
 Before replacing `hbbs`/`hbbr` in production:
