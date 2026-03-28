@@ -324,9 +324,9 @@ impl RendezvousServer {
         }
         let id = rk.id;
         let ip = addr.ip().to_string();
-        if id.len() < 6 {
+        if !hbb_common::is_valid_custom_id(&id) {
             return RegisterPkResponse {
-                result: register_pk_response::Result::UUID_MISMATCH.into(),
+                result: register_pk_response::Result::INVALID_ID_FORMAT.into(),
                 ..Default::default()
             };
         } else if !self.check_ip_blocker(&ip, &id).await {
